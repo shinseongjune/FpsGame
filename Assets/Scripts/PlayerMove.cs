@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerMove : MonoBehaviour
 {
@@ -15,6 +16,12 @@ public class PlayerMove : MonoBehaviour
     public float jumpPower = 10f;
 
     public bool isJumping = false;
+
+    public int hp = 20;
+
+    int maxHp = 20;
+
+    public Slider hpSlider;
 
     // Start is called before the first frame update
     void Start()
@@ -56,5 +63,11 @@ public class PlayerMove : MonoBehaviour
 
         cc.Move(dir * moveSpeed * Time.deltaTime);
 
+        hpSlider.value = (float)hp / (float)maxHp;
+    }
+
+    public void DamageAction(int damage)
+    {
+        hp -= damage;
     }
 }
