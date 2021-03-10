@@ -33,6 +33,7 @@ public class EnemyFSM : MonoBehaviour
     public int attackPower = 3;
 
     Vector3 originPos;
+    Quaternion originRot;
 
     public float moveDistance = 20f;
 
@@ -44,6 +45,8 @@ public class EnemyFSM : MonoBehaviour
 
     CharacterController cc;
 
+    Animator anim;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -54,6 +57,9 @@ public class EnemyFSM : MonoBehaviour
         cc = GetComponent<CharacterController>();
 
         originPos = transform.position;
+        originRot = transform.rotation;
+
+        anim = transform.GetComponentInChildren<Animator>();
     }
 
     // Update is called once per frame
@@ -90,6 +96,8 @@ public class EnemyFSM : MonoBehaviour
         {
             m_State = EnemyState.Move;
             print("상태 전환: Idle -> Move");
+
+            anim.SetTrigger("IdleToMove");
         }
     }
 
@@ -105,11 +113,17 @@ public class EnemyFSM : MonoBehaviour
             Vector3 dir = (player.position - transform.position).normalized;
 
             cc.Move(dir * moveSpeed * Time.deltaTime);
+
+            transform.forward = dir;
         }
         else
         {
             m_State = EnemyState.Attack;
             print("상태 전환: Move -> Attack");
+
+            currentTime = attackDelay;
+
+            anim.SetTrigger("MoveToAttackDelay");
         }
     }
 
@@ -120,9 +134,11 @@ public class EnemyFSM : MonoBehaviour
             currentTime += Time.deltaTime;
             if(currentTime > attackDelay)
             {
-                player.GetComponent<PlayerMove>().DamageAction(attackPower);
+                // player.GetComponent<PlayerMove>().DamageAction(attackPower);
                 print("공격");
                 currentTime = 0;
+
+                anim.SetTrigger("StartAttack");
             }
         }
         else
@@ -130,7 +146,14 @@ public class EnemyFSM : MonoBehaviour
             m_State = EnemyState.Move;
             print("상태 전환: Attack -> Move");
             currentTime = attackDelay;
+
+            anim.SetTrigger("AttackToMove");
         }
+    }
+
+    public void AttackAction()
+    {
+        player.GetComponent<PlayerMove>().DamageAction(attackPower);
     }
 
     void Return()
@@ -139,14 +162,19 @@ public class EnemyFSM : MonoBehaviour
         {
             Vector3 dir = (originPos - transform.position).normalized;
             cc.Move(dir * moveSpeed * Time.deltaTime);
+
+            transform.forward = dir;
         }
         else
         {
             transform.position = originPos;
+            transform.rotation = originRot;
 
             hp = maxHp;
             m_State = EnemyState.Idle;
             print("상태 전환: Return -> Idle");
+
+            anim.SetTrigger("MoveToIdle");
         }
     }
 
@@ -163,12 +191,16 @@ public class EnemyFSM : MonoBehaviour
         {
             m_State = EnemyState.Damaged;
             print("상태 전환: Any state -> Damaged");
+
+            anim.SetTrigger("Damaged");
             Damaged();
         }
         else
         {
             m_State = EnemyState.Die;
             print("상태 전환: Any state -> Die");
+
+            anim.SetTrigger("Die");
             Die();
         }
     }
@@ -180,7 +212,7 @@ public class EnemyFSM : MonoBehaviour
 
     IEnumerator DamageProcess()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
 
         m_State = EnemyState.Move;
         print("상태 전환: Damaged -> Move");
