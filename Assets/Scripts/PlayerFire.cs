@@ -18,6 +18,17 @@ public class PlayerFire : MonoBehaviour
 
     public GameObject[] eff_Flash;
 
+    public GameObject weapon01;
+    public GameObject weapon02;
+
+    public GameObject crosshair01;
+    public GameObject crosshair02;
+
+    public GameObject weapon01_R;
+    public GameObject weapon02_R;
+
+    public GameObject crosshair02_zoom;
+
     ParticleSystem ps;
 
     Animator anim;
@@ -54,6 +65,16 @@ public class PlayerFire : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
+            weapon01.SetActive(true);
+            weapon02.SetActive(false);
+            crosshair01.SetActive(true);
+            crosshair02.SetActive(false);
+            weapon01_R.SetActive(true);
+            weapon02_R.SetActive(false);
+
+            crosshair02_zoom.SetActive(false);
+            ZoomMode = false;
+
             wMode = WeaponMode.Normal;
 
             Camera.main.fieldOfView = 60f;
@@ -62,6 +83,14 @@ public class PlayerFire : MonoBehaviour
         }
         else if (Input.GetKeyDown(KeyCode.Alpha2))
         {
+            weapon01.SetActive(false);
+            weapon02.SetActive(true);
+            crosshair01.SetActive(false);
+            crosshair02.SetActive(true);
+            weapon01_R.SetActive(false);
+            weapon02_R.SetActive(true);
+
+            wMode = WeaponMode.Normal;
             wMode = WeaponMode.Sniper;
 
             wModeText.text = "Sniper Mode";
@@ -84,11 +113,15 @@ public class PlayerFire : MonoBehaviour
                     {
                         Camera.main.fieldOfView = 15f;
                         ZoomMode = true;
+                        crosshair02_zoom.SetActive(true);
+                        crosshair02.SetActive(false);
                     }
                     else
                     {
                         Camera.main.fieldOfView = 60f;
                         ZoomMode = false;
+                        crosshair02_zoom.SetActive(false);
+                        crosshair02.SetActive(true);
                     }
                     break;
             }
